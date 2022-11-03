@@ -21,5 +21,12 @@
   <div class="quizz_results" *ngIf=isFinished>
     <h1>O seu resultado é:</h1>
     <p>{{answerSelected}}</p>
+    <button class="btn-option" (click)="nextQuestion()" *ngIf="!isLestQuestion" > Next Question</button>
+
+    <div class="quizz_restart" *ngIf="isLestQuestion">
+      <h1>O Quizz terminou</h1>
+      <button class="btn-option" (click)="backToFirst()">Recomeçar</button>
+    </div>
+
   </div>
 </div>

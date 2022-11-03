@@ -8,6 +8,9 @@ import quizz_questions from "../../../assets/data/quizz_questions.json"
 })
 export class QuizzComponent implements OnInit {
 
+
+  quizzSelected:number = 0;
+
   title:string = "";
 
   questions:any;
@@ -20,19 +23,27 @@ export class QuizzComponent implements OnInit {
   questionMaxIndex:number = 0;
 
   isFinished:boolean = false;
+  isLestQuestion:boolean = false;
 
   constructor() { }
 
   ngOnInit(): void {
+    this.quizzSelected=0;
     if(quizz_questions) {
-      this.isFinished = false;
-      this.title = quizz_questions.title;
-
-      this.questions = quizz_questions.questions;
-      this.questionIndex = 0;
-      this.questionSelected = this.questions[this.questionIndex];
-      this.questionMaxIndex = this.questions.length;
+      this.loadQuizz(this.quizzSelected);
+      this.isLestQuestion = false;
     }
+  }
+
+  loadQuizz(id:number) {
+    this.quizzSelected = id;
+    this.isFinished = false;
+    this.title = quizz_questions.quizz[this.quizzSelected].title;
+    this.questions = quizz_questions.quizz[this.quizzSelected].questions;
+    this.questionIndex = 0;
+    this.questionSelected = this.questions[this.questionIndex];
+    this.questionMaxIndex = this.questions.length;
+    this.answers = [];
   }
 
   playerChoice(alias:string){
@@ -47,8 +58,16 @@ export class QuizzComponent implements OnInit {
       this.questionSelected = this.questions[this.questionIndex];
     } else {
       this.isFinished = true;
+
+      if(this.quizzSelected < quizz_questions.quizz.length-1) {
+        this.isLestQuestion = false;
+      } else {
+        this.isLestQuestion = true;
+      }
+
       const finalAnswer:string = await this.checkResult();
-      this.answerSelected = quizz_questions.results[finalAnswer as keyof typeof quizz_questions.results];
+      const type = quizz_questions.quizz[this.quizzSelected].results;
+      this.answerSelected = quizz_questions.quizz[this.quizzSelected].results[finalAnswer as keyof typeof type];
     }
   }
 
@@ -65,5 +84,18 @@ export class QuizzComponent implements OnInit {
     })
   }
 
+  nextQuestion() {
+    this.quizzSelected ++;
+    if(this.quizzSelected < quizz_questions.quizz.length){
+      this.loadQuizz(this.quizzSelected);
+    } else {
+      this.isLestQuestion = true;
+    }
+  }
+
+  backToFirst() {
+    this.quizzSelected = 0;
+    this.loadQuizz(this.quizzSelected);
+  }
 
 }
